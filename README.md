@@ -42,6 +42,7 @@ Acest proiect este realizat în cadrul disciplinei **Tehnologii Web** și are ca
 | Status | Boolean | true / false (Video vizionat / nevizionat) |
 
 ## Structura proiectului
+```bash
 proiect-tw/
 ├── backend/
 │   ├── config/
@@ -69,6 +70,7 @@ proiect-tw/
 │   ├── playlists.db       # Baza de date SQLite
 │   └── migrations/        # Migrări
 └── README.md              # Documentație
+```
 
 ## Funcționalități planificate
 
