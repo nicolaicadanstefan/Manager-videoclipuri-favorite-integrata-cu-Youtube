@@ -73,10 +73,10 @@ proiect-tw/
 ## Funcționalități planificate
 
 ### Back-end
-- [ ] Configurare proiect Node.js și Express
-- [ ] Implementare modele de date
-- [ ] API RESTful pentru playlist-uri și videoclipuri
-- [ ] Integrare YouTube API
+- [x] Configurare proiect Node.js și Express
+- [x] Implementare modele de date
+- [x] API RESTful pentru playlist-uri și videoclipuri
+- [x] Integrare YouTube API
 - [ ] Sistem de validare URL-uri
 
 ### Front-end
@@ -85,3 +85,28 @@ proiect-tw/
 - [ ] Preview videoclipuri
 - [ ] Sistem căutare și filtrare
 - [ ] Design responsive
+
+## Instrucțiuni de Rulare
+
+### Configurare
+1. Clonează repository-ul:
+   ```bash
+   - git clone https://github.com/nicolaicadanstefan/Manager-videoclipuri-favorite-integrata-cu-Youtube.git
+   - cd proiect-tw/backend/
+   - npm install
+   - Adaugam valori variabilelor din .env (PORT=3000, YOUTUBE_API_KEY=cheia api-ul pentru youtube)
+   - Pornim serverul (npm run dev)
+
+### Endpoint-uri API disponibile
+1.Playlist-uri
+- GET /api/playlists - Obtine toate playlist-urile
+- POST /api/playlists - Creeaza un playlist nou
+- GET /api/playlists/:id - Obtine un playlist specific
+- PUT /api/playlists/:id - Actualizeaza un playlist
+- DELETE /api/playlists/:id - Sterge un playlist
+
+2. Videoclip-uri
+- POST /api/playlists/:playlistId/videos - Adauga un video într-un playlist
+- GET /api/playlists/:playlistId/videos - Obtine toate videourile dintr-un playlist
+- PUT /api/videos/:id/status - Actualizeaza statusul unui video
+- DELETE /api/videos/:id - Sterge un video
