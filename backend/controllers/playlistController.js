@@ -1,31 +1,30 @@
-// Import modelele necesare pentru operatiile cu baza de date
 const { Playlist, Video } = require('../models');
 
-// Controllerul pentru gestionarea playlist-urilor
 const playlistController = {
-    // Creare playlist nou
     async create(req, res) {
         try {
+            console.log('Creare playlist nou:', req.body);
             const playlist = await Playlist.create(req.body);
             res.status(201).json(playlist);
         } catch (error) {
+            console.error('Eroare la creare playlist:', error);
             res.status(400).json({ error: error.message });
         }
     },
 
-    // Obtinere toate playlist-urile
     async getAll(req, res) {
         try {
+            console.log('Obținere toate playlist-urile');
             const playlists = await Playlist.findAll({
-                include: Video // Include si videoclipurile asociate
+                include: Video
             });
-            res.json(playlists);
+            res.json(playlists || []);
         } catch (error) {
+            console.error('Eroare la obținere playlist-uri:', error);
             res.status(500).json({ error: error.message });
         }
     },
 
-    // Obtinere playlist după ID
     async getById(req, res) {
         try {
             const playlist = await Playlist.findByPk(req.params.id, {
@@ -40,7 +39,6 @@ const playlistController = {
         }
     },
 
-    // Actualizare playlist
     async update(req, res) {
         try {
             const playlist = await Playlist.findByPk(req.params.id);
@@ -54,7 +52,6 @@ const playlistController = {
         }
     },
 
-    // Stergere playlist
     async delete(req, res) {
         try {
             const playlist = await Playlist.findByPk(req.params.id);

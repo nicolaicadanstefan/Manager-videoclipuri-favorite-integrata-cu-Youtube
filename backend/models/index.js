@@ -1,22 +1,75 @@
-// Import modelelor
-const Playlist = require('./Playlist');
-const Video = require('./Video');
+const { sequelize } = require('../config/db');
+const { DataTypes } = require('sequelize');
 
-// Definim relația One-to-Many intre Playlist și Video
-// Un playlist poate avea multe videoclipuri
+const Playlist = sequelize.define('Playlist', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    nume: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+            notEmpty: true
+        }
+    },
+    descriere: {
+        type: DataTypes.TEXT
+    },
+    categorie: {
+        type: DataTypes.STRING
+    },
+    vizibilitate: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true
+    }
+});
+
+const Video = sequelize.define('Video', {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
+    playlistId: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+    },
+    titlu: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    urlYoutube: {
+        type: DataTypes.STRING,
+        allowNull: false
+    },
+    thumbnail: {
+        type: DataTypes.STRING
+    },
+    durata: {
+        type: DataTypes.STRING
+    },
+    durataFormatata: {
+        type: DataTypes.STRING
+    },
+    status: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
+});
+
 Playlist.hasMany(Video, {
     foreignKey: 'playlistId',
-    // Cand o sa stergem un playlist, se va sterge si videoclipurile asociate acelui playlist
     onDelete: 'CASCADE'
 });
 
-// Un video aparține unui singur playlist
 Video.belongsTo(Playlist, {
     foreignKey: 'playlistId'
 });
 
-// Exportăm modelele pentru a le folosi în aplicație
 module.exports = {
+    sequelize,
     Playlist,
     Video
 };

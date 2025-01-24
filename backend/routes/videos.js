@@ -1,18 +1,41 @@
 const express = require('express');
-const router = express.Router({ mergeParams: true });
+const router = express.Router({ mergeParams: true }); // mergeParams is important here
 const videoController = require('../controllers/videoController');
 
-// Rute pentru videoclipuri
-// POST /api/playlists/:playlistId/videos - Adauga un video într-un playlist
-router.post('/', videoController.create);
+if (!videoController || !videoController.create) {
+    console.error('Video controller or create method is undefined!');
+}
 
-// GET /api/playlists/:playlistId/videos - Obtine toate videourile dintr-un playlist
-router.get('/', videoController.getAllByPlaylist);
+router.post('/', async (req, res, next) => {
+    try {
+        await videoController.create(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
 
-// PUT /api/videos/:id/status - Actualizeaza statusul unui video
-router.put('/:id/status', videoController.updateStatus);
+router.get('/', async (req, res, next) => {
+    try {
+        await videoController.getAllByPlaylist(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
 
-// DELETE /api/videos/:id - Sterge un video
-router.delete('/:id', videoController.delete);
+router.put('/:id/status', async (req, res, next) => {
+    try {
+        await videoController.updateStatus(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
+
+router.delete('/:id', async (req, res, next) => {
+    try {
+        await videoController.delete(req, res);
+    } catch (error) {
+        next(error);
+    }
+});
 
 module.exports = router;

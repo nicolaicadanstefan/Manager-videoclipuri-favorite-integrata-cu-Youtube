@@ -1,60 +1,67 @@
-// Pentru a citi variabilele din .env (API / PORTUL)
-const dotenv = require('dotenv');
-// Încărcăm variabilele de mediu
-dotenv.config();
+require('dotenv').config();
 
-// Importam framework-ul Express
+console.log('Environment check:', {
+    port: process.env.PORT,
+    hasYoutubeKey: !!process.env.YOUTUBE_API_KEY
+});
+
 const express = require('express');
-// Permitem request-uri cross-origin (sa comunici backend-ul cu frontend-ul)
 const cors = require('cors');
+const { sequelize } = require('./config/db');
 
-// Importăm rutele
-const playlistRoutes = require('./routes/playlists');
-const videoRoutes = require('./routes/videos');
-
-const { sequelize, testConnection } = require('./config/db');
-
-// Testez conexiunea și sincronizez modelele cu baza de date
-sequelize.sync({ force: false }) // force: false -> nu stergem datele existente
-    .then(() => {
-        testConnection();
-        console.log('Modele sincronizate cu baza de date');
-    })
-    .catch(err => {
-        console.error('Eroare la sincronizarea modelelor:', err);
-    });
-
-// Creem aplicatia Express
 const app = express();
 
-// Activam CORS pentru toate rutele
-app.use(cors());
-// Pentru a putea procesa JSON in request-uri
+app.use(cors({
+    origin: 'http://localhost:3001',
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type']
+}));
+
 app.use(express.json());
 
-// Utilizam rutele
-app.use('/api/playlists', playlistRoutes);
-
-
-// Configurare port
-const PORT = process.env.PORT || 3000;
-
-// Test endpoint
-// Cand cineva acceseaza ruta principala
-app.get('/', (req, res) => {
-    res.json({ message: 'Backend server is running!' });
-});
-
-// Gestionarea erorilor
 app.use((err, req, res, next) => {
-    console.error(err.stack);
-    res.status(500).json({ 
-        error: 'A apărut o eroare!',
-        message: err.message 
+    console.error('Server Error:', err);
+    
+    res.status(err.status || 500).json({
+        error: err.message || 'Internal Server Error'
     });
 });
 
-// Pornim serverul pe portul specificat
-app.listen(PORT, () => {
-    console.log(`Serverul rulează pe portul ${PORT}`);
+app.use((req, res, next) => {
+    const oldJson = res.json;
+    res.json = function(data) {
+        if (data && data.error) {
+            res.status(400);
+        }
+        return oldJson.call(this, data);
+    };
+    next();
 });
+
+const playlistRoutes = require('./routes/playlists');
+app.use('/api/playlists', playlistRoutes);
+
+app.use('*', (req, res) => {
+    res.status(404).json({ error: 'Route not found' });
+});
+
+const PORT = process.env.PORT || 3000;
+
+async function startServer() {
+    try {
+        await sequelize.authenticate();
+        console.log('Database connection established');
+        
+        await sequelize.sync({ force: false });
+        console.log('Database models synchronized');
+        
+        app.listen(PORT, () => {
+            console.log(`Server running at http://localhost:${PORT}`);
+        });
+    } catch (error) {
+        console.error('Server startup error:', error);
+        process.exit(1);
+    }
+}
+
+startServer();
